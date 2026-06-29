@@ -1,0 +1,110 @@
+/* ===== Paleta estilo Apple ===== */
+:root {
+  --text: #1d1d1f;          /* casi-negro */
+  --muted: #6e6e73;         /* gris secundario */
+
+  /* Colores de sistema de Apple para el ESTADO de cada tarea */
+  --status-red: #ff3b30;    /* pendiente */
+  --status-yellow: #ffcc00; /* en progreso */
+  --status-green: #34c759;  /* hecho */
+}
+
+/* ===== Reset básico ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, "Segoe UI", sans-serif;
+  color: var(--text);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 56px 16px;
+  /* Degradado claro y neutro: deja ver el desenfoque del vidrio sin meter color */
+  background: linear-gradient(135deg, #e6e9f2 0%, #dfe3ee 50%, #eae6f1 100%);
+  background-attachment: fixed;
+}
+
+/* ===== Panel principal: vidrio bien marcado ===== */
+.app-container {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 32px;
+  border-radius: 22px;
+
+  /* --- Glass --- */
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(28px) saturate(160%);
+  -webkit-backdrop-filter: blur(28px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== Encabezado ===== */
+header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+
+header h1 {
+  font-size: 30px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+
+header p {
+  margin-top: 6px;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* ===== Lista de tareas ===== */
+ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+li {
+  /* Cada tarea: tarjeta de vidrio más translúcida */
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 17px;
+  color: var(--text);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+
+  --status: var(--muted); /* color por defecto */
+}
+
+/* Punto de estado de color a la izquierda de cada tarea */
+li::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--status);
+  box-shadow: 0 0 8px var(--status); /* leve resplandor del color del estado */
+}
+
+/* Estado por tarea (de momento por posición en la lista) */
+li:nth-child(1) { --status: var(--status-red); }    /* Estudiar React → pendiente */
+li:nth-child(2) { --status: var(--status-yellow); } /* Practicar componentes → en progreso */
+li:nth-child(3) { --status: var(--status-green); }  /* Entender props → hecho */
+
+/* Hover: la tarjeta sube y el vidrio se vuelve más nítido */
+li:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
