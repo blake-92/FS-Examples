@@ -5,6 +5,7 @@
     "moduleResolution": "nodenext",
     "verbatimModuleSyntax": true,
     "erasableSyntaxOnly": true,
+    "esModuleInterop": true,
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true
