@@ -1,7 +1,7 @@
 // TaskCard ahora recibe "props": datos que le envía quien lo usa.
 function TaskCard(props) {
   return (
-    // <li> para que cada tarea sea un elemento de la lista <ul> (estilo en App.css).
+    // <li> porque cada tarjeta es un elemento de la lista <ul> de TaskList (estilo en index.css).
     <li>
       {/* props.text es el texto que llega desde App.jsx */}
       <p>{props.text}</p>

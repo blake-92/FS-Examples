@@ -1,0 +1,3 @@
+node_modules
+# Las credenciales no se suben a git
+.env
