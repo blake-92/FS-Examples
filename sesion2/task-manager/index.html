@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<!-- Indica que el documento usa HTML5 -->
+
+<html lang="es">
+<!-- Elemento principal; lang="es" indica que el contenido está en español -->
+
+<head>
+  <!-- Configuración general de la página -->
+
+  <meta charset="UTF-8">
+  <!-- Permite mostrar tildes, ñ y símbolos correctamente -->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Hace que la página se adapte a computadoras, tablets y celulares -->
+
+  <title>Task Manager</title>
+  <!-- Texto que aparece en la pestaña del navegador -->
+
+  <style>
+    /* Estilo general de la página */
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f4f4f4;
+    }
+
+    /* Título principal */
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    /* Campo de texto */
+    input {
+      padding: 10px;
+      width: 250px;
+      font-size: 16px;
+    }
+
+    /* Botones */
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+
+    /* Lista de tareas */
+    ul {
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    /* Cada tarea */
+    li {
+      list-style: none;
+      background-color: white;
+      padding: 10px;
+      margin-bottom: 8px;
+      /* Coloca el texto y el botón eliminar en extremos opuestos */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Botón eliminar */
+    .delete-btn {
+      padding: 6px 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Todo lo que va dentro de body es visible en la página -->
+
+  <h1>Task Manager</h1>
+
+  <input
+    type="text"
+    id="taskInput"
+    placeholder="Escribe una nueva tarea"
+  >
+
+  <button id="addTaskBtn">Agregar tarea</button>
+
+  <ul id="taskList">
+    <!-- Aquí aparecerán las tareas -->
+  </ul>
+
+  <script>
+    // Referencias a los elementos del HTML
+    const taskInput = document.getElementById("taskInput");
+    const addTaskBtn = document.getElementById("addTaskBtn");
+    const taskList = document.getElementById("taskList");
+
+    // Función que crea y agrega una nueva tarea
+    const addTask = () => {
+      // Texto escrito por el usuario, sin espacios sobrantes
+      const taskText = taskInput.value.trim();
+
+      // No agregar tareas vacías
+      if (taskText === "") {
+        return;
+      }
+
+      // Crear la fila <li>
+      const li = document.createElement("li");
+
+      // Crear el <span> con el texto de la tarea
+      const taskSpan = document.createElement("span");
+      taskSpan.textContent = taskText;
+
+      // Crear el botón Eliminar
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Eliminar";
+      deleteButton.classList.add("delete-btn");
+      deleteButton.addEventListener("click", () => {
+        li.remove(); // elimina la tarea completa
+      });
+
+      // Armar la fila: texto + botón
+      li.appendChild(taskSpan);
+      li.appendChild(deleteButton);
+      taskList.appendChild(li);
+
+      // Limpiar el campo y devolver el cursor
+      taskInput.value = "";
+      taskInput.focus();
+    };
+
+    // Agregar con clic en el botón
+    addTaskBtn.addEventListener("click", addTask);
+
+    // Agregar también al presionar Enter
+    taskInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        addTask();
+      }
+    });
+  </script>
+
+</body>
+</html>
+<!-- Fin del documento HTML -->
