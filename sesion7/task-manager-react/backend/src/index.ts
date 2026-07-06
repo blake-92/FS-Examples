@@ -1,6 +1,6 @@
 import express, { type Request, type Response, type NextFunction } from "express";
 import cors from "cors";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 
@@ -84,7 +84,8 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
   }
 
   try {
-    jwt.verify(token, JWT_SECRET);
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    (req as any).userEmail = decoded.email;
     next();
   } catch {
     res.status(401).json({ message: "Invalid token" });
@@ -92,11 +93,15 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
 };
 
 app.get("/tasks", requireAuth, async (req: Request, res: Response) => {
-  const tasksFromDatabase = await prisma.task.findMany();
+  const userEmail = (req as any).userEmail as string;
+  const tasksFromDatabase = await prisma.task.findMany({
+    where: { user: { email: userEmail } },
+  });
   res.json(tasksFromDatabase);
 });
 
 app.post("/tasks", requireAuth, async (req: Request, res: Response) => {
+  const userEmail = (req as any).userEmail as string;
   const { text, dueDate, description } = req.body;
 
   if (!text || text.trim() === "") {
@@ -108,6 +113,7 @@ app.post("/tasks", requireAuth, async (req: Request, res: Response) => {
       text: text.trim(),
       dueDate: dueDate,
       description: description,
+      user: { connect: { email: userEmail } },
     },
   });
 
@@ -116,28 +122,35 @@ app.post("/tasks", requireAuth, async (req: Request, res: Response) => {
 
 app.put("/tasks/:id", requireAuth, async (req: Request, res: Response) => {
   const id = Number(req.params.id);
+  const userEmail = (req as any).userEmail as string;
   const { text, status, dueDate, description, completed } = req.body;
 
-  try {
-    const updated = await prisma.task.update({
-      where: { id },
-      data: { text, status, dueDate, description, completed },
-    });
-    res.json(updated);
-  } catch {
-    res.status(404).json({ message: "Task not found" });
+  const result = await prisma.task.updateMany({
+    where: { id, user: { email: userEmail } },
+    data: { text, status, dueDate, description, completed },
+  });
+
+  if (result.count === 0) {
+    return res.status(404).json({ message: "Task not found" });
   }
+
+  const updated = await prisma.task.findUnique({ where: { id } });
+  res.json(updated);
 });
 
 app.delete("/tasks/:id", requireAuth, async (req: Request, res: Response) => {
   const id = Number(req.params.id);
+  const userEmail = (req as any).userEmail as string;
 
-  try {
-    await prisma.task.delete({ where: { id } });
-    res.json({ message: "Task deleted successfully" });
-  } catch {
-    res.status(404).json({ message: "Task not found" });
+  const result = await prisma.task.deleteMany({
+    where: { id, user: { email: userEmail } },
+  });
+
+  if (result.count === 0) {
+    return res.status(404).json({ message: "Task not found" });
   }
+
+  res.json({ message: "Task deleted successfully" });
 });
 
 app.listen(PORT, () => {
