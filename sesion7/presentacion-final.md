@@ -13,11 +13,11 @@ Basada en `guias-pdf/Sesion7/4-Guia Presentacion Final.pdf` y en el proyecto rea
 
 - [ ] **Docker encendido** y la base levantada:
   `cd ejercicios/sesion7/task-manager-react/backend && docker compose up -d`
-- [ ] **Datos listos** (usuario de demo + tareas): `npm run seed`
+- [ ] **Datos listos** (3 usuarios de demo, cada uno con sus tareas): `npm run seed`
 - [ ] **Backend corriendo**: `npm run dev` (dice `Server running on port 3000`).
 - [ ] **Frontend corriendo** (otra terminal): `npm run dev` (`http://localhost:5173`).
 - [ ] **Prisma Studio** abierto en otra pestaña: `npx prisma studio` (`http://localhost:5555`).
-- [ ] **Thunder Client** con 3 peticiones guardadas: `POST /login`, `GET /profile` (con y sin token).
+- [ ] **Postman** con 3 peticiones guardadas: `POST /login`, `GET /profile` (con y sin token).
 - [ ] **VS Code** abierto en el proyecto, con `backend/src/index.ts` y `src/App.tsx` a mano.
 - [ ] **Diapositivas** abiertas en pantalla completa.
 - [ ] Sesión cerrada en el navegador (para mostrar la **pantalla de login** desde cero).
@@ -36,7 +36,7 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
 |---|---|---|
 | **0-2 min** · Intro | [A] | Portada: nombre del proyecto, integrantes, **objetivo** (gestor de tareas Kanban full stack) y **tecnologías** (React, Express, Prisma, PostgreSQL, JWT, bcrypt, Docker). |
 | **2-5 min** · Arquitectura + CRUD | [B] | Diagrama: cómo viaja una petición React → Express → Prisma → PostgreSQL. Explicar el **CRUD** (las 4 operaciones sobre las tareas) y el carril de auth (login → bcrypt → JWT → ruta protegida). |
-| **5-11 min** · Demo en vivo | [A] y [B] | La demostración (ver checklist §3). [A] maneja el navegador; [B] muestra Prisma Studio y Thunder Client. |
+| **5-11 min** · Demo en vivo | [A] y [B] | La demostración (ver checklist §3). [A] maneja el navegador; [B] muestra Prisma Studio y Postman. |
 | **11-13 min** · Autenticación | [B] | Explicar login con usuario real, **bcrypt** (hash de contraseñas), **JWT** (token) y **ruta protegida**, apoyándose en el código. |
 | **13-15 min** · Conclusión | [A] | Aprendizajes, dificultades y mejoras futuras. Cerrar con la frase guía. |
 
@@ -83,7 +83,8 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
   | **R** | Leer | `GET /tasks` | `prisma.task.findMany()` | Cargar el tablero al abrir |
   | **U** | Actualizar | `PUT /tasks/:id` | `prisma.task.update()` | Editar el texto o **mover** de columna |
   | **D** | Eliminar | `DELETE /tasks/:id` | `prisma.task.delete()` | Borrar con la papelera |
-- Todas estas rutas están **protegidas** con el token (`requireAuth`).
+- Todas estas rutas están **protegidas** con el token (`requireAuth`) y son **por usuario**: cada
+  quien solo ve y toca **sus propias** tareas (filtradas por el email del token; tocar una ajena → 404).
 
 **Slide 7 — Autenticación: login, bcrypt, JWT y ruta protegida**
 - **Login:** el usuario manda email + contraseña.
@@ -94,14 +95,14 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
 
 **Slide 8 — Capturas del proyecto**
 - Pantalla de **login**, el **Kanban** con tareas, **Prisma Studio** mostrando las tablas `Task` y
-  `User` (con la contraseña hasheada), y una respuesta de **Thunder Client** con el token.
+  `User` (con la contraseña hasheada), y una respuesta de **Postman** con el token.
 
 **Slide 9 — Conclusión**
 - **Aprendizajes:** cómo se conecta un frontend con un backend y una base de datos; qué es un ORM;
   cómo funciona la autenticación con tokens.
 - **Dificultades:** (personalízalo) p. ej. configurar Docker/Postgres, entender async/await, CORS,
   o el manejo del token en el frontend.
-- **Mejoras futuras:** registro desde el frontend, que cada usuario vea solo sus tareas, refresh tokens.
+- **Mejoras futuras:** registro desde el frontend, refresh tokens, marcar "completada" como acción propia.
 
 ---
 
@@ -117,12 +118,15 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
 7. **(Update)** Editar una tarea y **mover otra** de columna (arrastrar y soltar).
 8. **(Delete)** Eliminar una tarea con la papelera → *"Acabo de hacer las 4 operaciones del CRUD."*
 9. **Recargar la página** → los cambios siguen ahí → *"Todo se guardó en la base de datos."*
-10. **Prisma Studio** (o `psql`) → abrir la tabla **Task** y mostrar que refleja lo que hiciste.
-11. **Thunder Client → `POST /login`** → mostrar que el backend devuelve un **token**.
-12. **Thunder Client → `GET /profile` con `Authorization: Bearer <token>`** → responde los datos
+10. **(Tareas por usuario)** Cerrar sesión y entrar como **`ana@test.com`** / `123456` → aparecen
+    **otras** tareas (las de ana), no las de admin → *"Cada usuario ve solo las suyas."*
+11. **Prisma Studio** (o `psql`) → abrir la tabla **Task** y mostrar que refleja lo que hiciste (y la
+    columna `userId`, que indica el **dueño** de cada tarea).
+12. **Postman → `POST /login`** → mostrar que el backend devuelve un **token**.
+13. **Postman → `GET /profile` con `Authorization: Bearer <token>`** → responde los datos
     protegidos.
-13. **`GET /profile` (o `/tasks`) sin token** → responde **401** → *"Sin token, no hay acceso."*
-14. **(bcrypt)** En Prisma Studio, tabla **User** → mostrar que `password` es un **hash `$2b$10$...`**,
+14. **`GET /profile` (o `/tasks`) sin token** → responde **401** → *"Sin token, no hay acceso."*
+15. **(bcrypt)** En Prisma Studio, tabla **User** → mostrar que `password` es un **hash `$2b$10$...`**,
     no `123456`.
 
 ---
@@ -139,6 +143,7 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
 | **bcrypt** | Protege las contraseñas: guarda un **hash** irreversible, no la contraseña. Compara con `bcrypt.compare`. |
 | **JWT** | Genera un **token** firmado al iniciar sesión, que prueba que el usuario ya se autenticó. Caduca en 1h. |
 | **Ruta protegida** | Un middleware (`requireAuth`) revisa el token **antes** de dejar entrar a las rutas de tareas. |
+| **Tareas por usuario** | Cada tarea tiene un **dueño** (`userId`). Las rutas filtran por el email del token, así cada quien ve solo las suyas; tocar una ajena → 404. |
 | **Docker** | PostgreSQL corre en un contenedor: se levanta con un comando y no ensucia la máquina. |
 
 ---
@@ -161,6 +166,9 @@ Reparte por capas: **[A]** = quien domina el frontend, **[B]** = quien domina el
   menos que el backend lo permita con CORS.
 - **¿Qué pasa si mando una petición a `/tasks` sin token?** El middleware responde **401** y la
   petición nunca llega a la base.
+- **¿Un usuario puede ver o editar las tareas de otro?** No. Cada consulta filtra por el dueño
+  (el email del token). Si pides editar/borrar una tarea ajena por su `id`, la respuesta es **404**
+  (para el servidor, "esa tarea tuya no existe"), y la tarea del otro queda intacta.
 
 ---
 
