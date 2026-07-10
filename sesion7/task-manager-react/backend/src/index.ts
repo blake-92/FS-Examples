@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
@@ -14,7 +14,8 @@ if (!JWT_SECRET) {
 
 const prisma = new PrismaClient();
 
-app.use(cors());
+const FRONTEND_URL = process.env.FRONTEND_URL;
+app.use(cors(FRONTEND_URL ? { origin: FRONTEND_URL, credentials: true } : {}));
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
@@ -22,16 +23,16 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.post("/register", async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { name, email, password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
+  if (!name || !email || !password) {
+    return res.status(400).json({ message: "Name, email and password are required" });
   }
 
   try {
     const hash = await bcrypt.hash(password, 10);
-    const user = await prisma.user.create({ data: { email, password: hash } });
-    res.status(201).json({ id: user.id, email: user.email });
+    const user = await prisma.user.create({ data: { name, email, password: hash } });
+    res.status(201).json({ id: user.id, name: user.name, email: user.email });
   } catch {
     res.status(409).json({ message: "El email ya está registrado" });
   }
@@ -50,8 +51,12 @@ app.post("/login", async (req: Request, res: Response) => {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  const token = jwt.sign({ email: user.email }, JWT_SECRET, { expiresIn: "1h" });
-  res.json({ message: "Login successful", token: token });
+  const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1h" });
+  res.json({
+    message: "Login successful",
+    token: token,
+    user: { id: user.id, name: user.name, email: user.email },
+  });
 });
 
 app.get("/profile", (req: Request, res: Response) => {

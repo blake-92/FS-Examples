@@ -7,11 +7,14 @@ import TaskBoard from "./components/TaskBoard";
 import EmptyState from "./components/EmptyState";
 import Footer from "./components/Footer";
 import Login from "./components/Login";
+import Register from "./components/Register";
 
-const API_URL = "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function App() {
   const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
+
+  const [authView, setAuthView] = useState<"login" | "register">("login");
 
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -96,7 +99,16 @@ function App() {
   ).length;
 
   if (!token) {
-    return <Login apiUrl={API_URL} onLogin={saveToken} />;
+    if (authView === "register") {
+      return <Register apiUrl={API_URL} onSwitchToLogin={() => setAuthView("login")} />;
+    }
+    return (
+      <Login
+        apiUrl={API_URL}
+        onLogin={saveToken}
+        onSwitchToRegister={() => setAuthView("register")}
+      />
+    );
   }
 
   return (

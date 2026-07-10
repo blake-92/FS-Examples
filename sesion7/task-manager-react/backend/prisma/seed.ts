@@ -5,6 +5,7 @@ const prisma = new PrismaClient();
 
 const USERS = [
   {
+    name: "Admin",
     email: "admin@test.com",
     password: "123456",
     tasks: [
@@ -13,6 +14,7 @@ const USERS = [
     ],
   },
   {
+    name: "Ana",
     email: "ana@test.com",
     password: "123456",
     tasks: [
@@ -21,6 +23,7 @@ const USERS = [
     ],
   },
   {
+    name: "Luis",
     email: "luis@test.com",
     password: "123456",
     tasks: [
@@ -35,8 +38,8 @@ async function main() {
     const hash = await bcrypt.hash(u.password, 10);
     const user = await prisma.user.upsert({
       where: { email: u.email },
-      update: { password: hash },
-      create: { email: u.email, password: hash },
+      update: { name: u.name, password: hash },
+      create: { name: u.name, email: u.email, password: hash },
     });
 
     const count = await prisma.task.count({ where: { userId: user.id } });
