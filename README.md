@@ -10,6 +10,11 @@ con contraseñas hasheadas con **bcrypt**. El proyecto está en `sesion7/task-ma
 
 > Las carpetas `sesion2`–`sesion6` son ejercicios previos del curso.
 
+> **Versión mantenida:** el proyecto siguió creciendo en
+> [blake-92/TaskManager](https://github.com/blake-92/TaskManager). El tag `m01-entrega` marca esta
+> misma entrega del Módulo 1, y `m04-final` el estado con CI/CD, Docker y despliegue del Módulo 4.
+> Este repo queda como copia congelada de los ejercicios del Módulo 1.
+
 ---
 
 ## Setup — levantar el proyecto desde cero
